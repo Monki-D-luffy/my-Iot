@@ -1,17 +1,20 @@
 <script setup lang="ts">
 // 1. 引入组件：注意使用了大括号 {}，因为 Button 是具名导出
-import { Button } from '@/components/ui/button'
+import DeviceCard from '@/components/DeviceCard.vue'
+
 </script>
 
 <template>
-  <div class="flex h-screen w-full items-center justify-center bg-background text-foreground">
-    <div class="flex flex-col items-center gap-4">
-      <h1 class="text-2xl font-bold tracking-tight">IoT 设备管理控制板 📡</h1>
+  <div class="min-h-screen bg-background p-8">
 
-      <Button variant="default" class="">连接设备</Button>
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 
-      <Button variant="destructive">断开连接</Button>
+      <DeviceCard name="客厅空调" :is-online="true" :temperature="26" />
+      <DeviceCard name="大门监控" :is-online="false" :temperature="0" />
+      <DeviceCard name="卧室加湿器" :is-online="true" :temperature="45" />
+
     </div>
+
   </div>
 </template>
 
