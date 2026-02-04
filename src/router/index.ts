@@ -9,7 +9,6 @@ const routes: RouteRecordRaw[] = [
         // 还没写页面？没关系，先留个占位或者指向一个空文件，重点是下面的 meta
         component: () => import('@/views/auth/LoginView.vue'),
         meta: {
-            // ❌ 试着把 title 删掉，你会发现代码爆红，因为我们在 env.d.ts 里规定了它是必填项
             title: '登录',
             requiresAuth: false,
         },
