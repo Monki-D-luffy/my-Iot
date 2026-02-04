@@ -24,6 +24,15 @@ const routes: RouteRecordRaw[] = [
             roles: ['admin', 'engineer'],
         },
     },
+    {
+        path: '404',
+        name: 'NotFound',
+        component: () => import('@/views/404.vue'),
+        meta: {
+            title: '页面未找到',
+            requiresAuth: false,
+        },
+    },
 ]
 
 // 2. 创建路由实例
