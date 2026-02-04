@@ -25,7 +25,7 @@ const routes: RouteRecordRaw[] = [
         },
     },
     {
-        path: '404',
+        path: '/404',
         name: 'NotFound',
         component: () => import('@/views/404.vue'),
         meta: {
