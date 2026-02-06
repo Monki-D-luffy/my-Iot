@@ -1,32 +1,52 @@
-// src/stores/auth.ts
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { loginApi } from '@/api/auth' // 👈 引入刚才写的 API
 
 export interface User {
-    // 定义你的 User 结构
     id: number
     name: string
     loginState: boolean
 }
 
 export const useAuthStore = defineStore('auth', () => {
-    // 1. State: 初始化时尝试从 localStorage 拿 token
     const token = ref<string | null>(localStorage.getItem('token'))
     const user = ref<User | null>(null)
 
-    // 2. Getters
     const isAuthenticated = computed(() => !!token.value)
-    console.log('登录中...')
-    // 3. Actions
-    function login(newToken: string) {
-        // 更新 token, 写入 localStorage
-        token.value = newToken
-        localStorage.setItem('token', newToken)
-        console.log('登录成功, Token:', newToken)
+
+    // 👇 改造 login 为异步函数
+    async function login(username: string, password: string) {
+        try {
+            console.log('正在请求登录接口...')
+
+            // 1. 发起真实请求
+            // 注意：这里硬编码了 productName，这是您后端要求的
+            const res: any = await loginApi({
+                userName: username,
+                password: password,
+                productName: 'ManagerIdentity'
+            })
+
+            // 2. 解析 Token (这里做了一些容错处理，防止后端返回结构不一致)
+            // 根据之前的经验，Token 可能藏在不同的字段里
+            const accessToken = res?.data?.accessToken || res?.accessToken || res?.data?.access_Token
+
+            if (accessToken) {
+                token.value = accessToken
+                localStorage.setItem('token', accessToken)
+                console.log('登录成功! Token:', accessToken)
+                return true
+            } else {
+                console.error('登录失败: 未找到 Token', res)
+                return false
+            }
+        } catch (error) {
+            console.error('登录请求出错:', error)
+            return false
+        }
     }
 
     function logout() {
-        // 清理 token, 清理 localStorage
         token.value = null
         localStorage.removeItem('token')
         user.value = null
