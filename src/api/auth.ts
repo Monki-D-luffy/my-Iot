@@ -1,5 +1,13 @@
 import request from '@/utils/request'
 
+// 所有的接口响应都会套用这个壳
+export interface ApiResponse<T = any> {
+    code: number;
+    message: string;
+    success: boolean;
+    data: T; // 这里的 T 就是具体的业务数据
+}
+
 // 1. 定义参数类型
 export interface LoginRequest {
     userName: string;
@@ -11,7 +19,13 @@ export interface LoginRequest {
 export interface LoginResult {
     accessToken: string;
     refreshToken: string;
-    // ... 其他字段
+    userId: string;
+    account: string;
+    nickname: string;
+    role: 'Admin' | 'User' | string; // 优先使用联合类型，增加代码提示
+    accessExpired: number;
+    refreshExpired: number;
+    // ... 其他字段如 email, isEnabled 等按需添加
 }
 
 // 3. 导出登录函数

@@ -10,7 +10,6 @@ export interface User {
 
 export const useAuthStore = defineStore('auth', () => {
     const token = ref<string | null>(localStorage.getItem('token'))
-    const user = ref<User | null>(null)
 
     const isAuthenticated = computed(() => !!token.value)
 
@@ -21,15 +20,14 @@ export const useAuthStore = defineStore('auth', () => {
 
             // 1. 发起真实请求
             // 注意：这里硬编码了 productName，这是您后端要求的
-            const res: any = await loginApi({
+            const res = await loginApi({
                 userName: username,
                 password: password,
                 productName: 'ManagerIdentity'
             })
 
-            // 2. 解析 Token (这里做了一些容错处理，防止后端返回结构不一致)
-            // 根据之前的经验，Token 可能藏在不同的字段里
-            const accessToken = res?.data?.accessToken || res?.accessToken || res?.data?.access_Token
+            // 2. 解析 Token 
+            const accessToken = res.data.accessToken
 
             if (accessToken) {
                 token.value = accessToken
@@ -49,9 +47,8 @@ export const useAuthStore = defineStore('auth', () => {
     function logout() {
         token.value = null
         localStorage.removeItem('token')
-        user.value = null
         console.log('已退出登录')
     }
 
-    return { token, user, isAuthenticated, login, logout }
+    return { token, isAuthenticated, login, logout }
 })
