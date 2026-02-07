@@ -2,9 +2,8 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import ButtonUse from '@/components/ui/button/Button.vue'
-import Input from '@/components/ui/input/Input.vue'
-import Label from '@/components/ui/label/Label.vue'
+
+import { Button, Input, Label } from '@/components/ui'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -58,10 +57,10 @@ const handleLogin = async () => {
                         placeholder="请输入密码" />
                 </div>
 
-                <ButtonUse @click="handleLogin" :disabled="loading"
+                <Button @click="handleLogin" :disabled="loading"
                     class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:bg-gray-400">
                     {{ loading ? '登录中...' : '登 录' }}
-                </ButtonUse>
+                </Button>
             </div>
         </div>
     </div>
