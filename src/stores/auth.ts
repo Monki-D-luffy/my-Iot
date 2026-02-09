@@ -1,16 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { loginApi } from '@/api/auth' // 👈 引入刚才写的 API
+import type { LoginResult } from '@/api/auth' // 👈 引入 LoginResult 类型定义
 
-export interface User {
-    id: number
-    name: string
-    loginState: boolean
-}
 
 export const useAuthStore = defineStore('auth', () => {
     const token = ref<string | null>(localStorage.getItem('token'))
-
+    const userInfo = ref<LoginResult | null>(null);
     const isAuthenticated = computed(() => !!token.value)
 
     // 👇 改造 login 为异步函数
@@ -31,6 +27,7 @@ export const useAuthStore = defineStore('auth', () => {
 
             if (accessToken) {
                 token.value = accessToken
+                userInfo.value = res.data
                 localStorage.setItem('token', accessToken)
                 console.log('登录成功! Token:', accessToken)
                 return true
@@ -50,5 +47,5 @@ export const useAuthStore = defineStore('auth', () => {
         console.log('已退出登录')
     }
 
-    return { token, isAuthenticated, login, logout }
+    return { token, isAuthenticated, userInfo, login, logout }
 })

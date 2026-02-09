@@ -13,6 +13,26 @@ const routes: RouteRecordRaw[] = [
             requiresAuth: false,
         },
     },
+
+    {
+        path: '/layout',
+        name: 'Layout',
+        children: [
+            {
+                path: 'overview',
+                name: 'Overview',
+                component: () => import('@/views/dashboard/Overview.vue'),
+                meta: {
+                    title: '概览',
+                    requiresAuth: true,
+                    icon: 'LayoutDashboard', // 这个 icon 名字要和你在组件库里注册的名字一致
+                    // 这里的 roles 是可选的，写了就必须是 string[]
+                    roles: ['admin', 'engineer'],
+                }
+            }
+        ],
+        component: () => import('@/layouts/DefaultLayout.vue'),
+    },
     {
         path: '/dashboard',
         name: 'Dashboard',
@@ -25,7 +45,7 @@ const routes: RouteRecordRaw[] = [
         },
     },
     {
-        path: '/404',
+        path: '/:pathMatch(.*)*',
         name: 'NotFound',
         component: () => import('@/views/404.vue'),
         meta: {
@@ -33,6 +53,7 @@ const routes: RouteRecordRaw[] = [
             requiresAuth: false,
         },
     },
+
 ]
 
 // 2. 创建路由实例

@@ -11,14 +11,16 @@ export function createRouteGuard(router: Router) {
 
         // 2. 获取 Store (必须在守卫内部获取，否则 Pinia 可能未初始化)
         const authStore = useAuthStore()
+        console.log('守卫检查: 内存Token=', authStore.token, '需要权限=', to.meta.requiresAuth)
+        console.log('token判断=', authStore.isAuthenticated);
 
         // 3. 核心守卫逻辑
         if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+            console.log('🛑 拦截: 未登录，踢回首页')
             // 没登录还想进？滚去登录
             return next({ name: 'Login' })
-        } else if (authStore.isAuthenticated && to.name === 'Login') {
-            return next({ name: 'Dashboard' })
         }
+        console.log('正常进入');
 
         next() // 放行
     })
