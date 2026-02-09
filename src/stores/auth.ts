@@ -6,7 +6,8 @@ import type { LoginResult } from '@/api/auth' // 👈 引入 LoginResult 类型�
 
 export const useAuthStore = defineStore('auth', () => {
     const token = ref<string | null>(localStorage.getItem('token'))
-    const userInfo = ref<LoginResult | null>(null);
+    const storedUser = localStorage.getItem('userInfo')
+    const userInfo = ref<LoginResult | null>(storedUser ? JSON.parse(storedUser) : null)
     const isAuthenticated = computed(() => !!token.value)
 
     // 👇 改造 login 为异步函数
@@ -29,6 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
                 token.value = accessToken
                 userInfo.value = res.data
                 localStorage.setItem('token', accessToken)
+                localStorage.setItem('userInfo', JSON.stringify(res.data))
                 console.log('登录成功! Token:', accessToken)
                 return true
             } else {

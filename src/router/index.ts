@@ -19,7 +19,7 @@ const routes: RouteRecordRaw[] = [
         name: 'Layout',
         children: [
             {
-                path: 'overview',
+                path: '/overview',
                 name: 'Overview',
                 component: () => import('@/views/dashboard/Overview.vue'),
                 meta: {
@@ -32,18 +32,12 @@ const routes: RouteRecordRaw[] = [
             }
         ],
         component: () => import('@/layouts/DefaultLayout.vue'),
-    },
-    {
-        path: '/dashboard',
-        name: 'Dashboard',
-        component: () => import('@/views/dashboard/Overview.vue'),
         meta: {
-            title: '监控大屏',
+            title: '侧边栏布局',
             requiresAuth: true,
-            // 这里的 roles 是可选的，写了就必须是 string[]
-            roles: ['admin', 'engineer'],
         },
     },
+
     {
         path: '/:pathMatch(.*)*',
         name: 'NotFound',

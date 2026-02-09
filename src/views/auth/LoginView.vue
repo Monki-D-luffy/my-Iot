@@ -30,7 +30,7 @@ const handleLogin = async () => {
         console.log('登录成功,跳转页面');
 
         // 登录成功，跳转首页
-        router.push('/NotFound')
+        router.push('/layout')
     } else {
         alert('登录失败，请检查账号密码')
     }

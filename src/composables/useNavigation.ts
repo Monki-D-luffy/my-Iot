@@ -1,45 +1,57 @@
-// 伪代码提示
-import { useRouter } from 'vue-router'
+// src/composables/useNavigation.ts
 import { computed } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth' // 👈 注意引用路径
 import type { RouteRecordRaw } from 'vue-router'
 
-// 这里的 NavItem 就是为了给侧边栏组件用的纯净数据
 export interface NavItem {
     title: string
     path: string
-    icon?: string
-    children?: NavItem[] // 支持多级菜单
-    active?: boolean     // 是否高亮
+    icon?: any // 暂时用 any，因为 component 类型比较复杂
+    children?: NavItem[]
 }
 
 export function useNavigation() {
     const router = useRouter()
     const authStore = useAuthStore()
 
-    // 核心递归函数：把 RouteRecordRaw 转成 NavItem
-    const transformRoutes = (routes: readonly RouteRecordRaw[]): NavItem[] => {
+    const transformRoutes = (routes: readonly RouteRecordRaw[], parentPath = ''): NavItem[] => {
         const list: NavItem[] = []
 
         routes.forEach(route => {
-            // 1. 过滤：如果 meta.hidden 为 true，直接跳过 (return)
-            if (route.meta?.hidden || !authStore.userInfo) return
+            // 1. 隐藏 & 权限过滤
+            if (route.meta?.hidden) {
+                console.log('hidden', route.meta?.hidden);
 
-            // 2. 权限过滤：检查 route.meta.roles 是否包含 authStore.userInfo.role
-            if (route.meta?.roles && !route.meta.roles.includes(authStore.userInfo.role)) {
+                return
+            }
+            if (route.meta?.roles && !authStore.userInfo) {
+                console.log('roles=', route.meta?.roles, 'userInfo=', authStore.userInfo);
                 return
             }
 
-            // 3. 构建 item 对象
-            const item: NavItem = {
-                title: (route.meta?.title as string) || '未命名',
-                path: route.path,
-                icon: route.meta?.icon as string,
+            // ⚠️ 权限判定核心修复：大小写不敏感
+            const routeRoles = route.meta?.roles as string[] | undefined
+            const userRole = authStore.userInfo?.role.toLowerCase()
+
+            if (routeRoles && userRole) {
+                const hasPermission = routeRoles.some(r => r.toLowerCase() === userRole)
+                if (!hasPermission) return
             }
 
-            // 4. 递归处理 children (如果有子路由)
+            // 2. 路径拼接修复 (防止 //dashboard)
+            const fullPath = route.path.startsWith('/')
+                ? route.path
+                : `${parentPath === '/' ? '' : parentPath}/${route.path}`
+
+            const item: NavItem = {
+                title: (route.meta?.title as string) || 'Untitled',
+                path: fullPath,
+                icon: route.meta?.icon,
+            }
+
             if (route.children) {
-                item.children = transformRoutes(route.children) // 递归调用自己
+                item.children = transformRoutes(route.children, fullPath)
             }
 
             list.push(item)
@@ -49,8 +61,10 @@ export function useNavigation() {
     }
 
     const menuItems = computed(() => {
-        // router.options.routes 包含了你在 router/index.ts 里定义的所有路由
-        return transformRoutes(router.options.routes)
+
+        // 过滤掉 layout 这一层，直接取它的 children
+        const layoutRoute = router.options.routes.find(r => r.path === '/layout')
+        return layoutRoute ? transformRoutes(layoutRoute.children || [], '') : []
     })
 
     return { menuItems }
